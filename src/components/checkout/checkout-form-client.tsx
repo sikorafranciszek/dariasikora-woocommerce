@@ -60,6 +60,15 @@ interface CheckoutFormClientProps {
   paymentGateways: PaymentGateway[];
 }
 
+/**
+ * Render a checkout form UI that collects billing/shipping details, selects a payment method, and places orders.
+ *
+ * Handles pre-filling from the logged-in user, calculates totals and shipping, initiates Stripe Checkout when Stripe is selected,
+ * and creates a WooCommerce order for other payment methods. Redirects to the cart page and returns `null` if the cart is empty.
+ *
+ * @param paymentGateways - Array of payment gateway objects used to render available payment methods (each gateway should include `id`, `title`, and optionally `description`)
+ * @returns The checkout form component UI, or `null` when the cart contains no items.
+ */
 export function CheckoutFormClient({
   paymentGateways,
 }: CheckoutFormClientProps) {

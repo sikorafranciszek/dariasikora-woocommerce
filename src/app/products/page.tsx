@@ -29,6 +29,19 @@ const searchParamsCache = createSearchParamsCache({
 
 type SearchParams = Awaited<ReturnType<typeof searchParamsCache.parse>>;
 
+/**
+ * Render a product listing based on parsed search parameters.
+ *
+ * Fetches products using the provided filters and renders a responsive grid of ProductCard components when products are found; otherwise renders a "no products found" message or an error card if fetching fails.
+ *
+ * @param searchParams - Parsed query parameters used to filter products. May include:
+ *   - `page`: page number to request
+ *   - `search`: full-text search string
+ *   - `category`: category id to filter by
+ *   - `featured`: whether to only include featured products
+ *   - `on_sale`: whether to only include products on sale
+ * @returns A React element containing the product grid, a no-results message, or an error notice.
+ */
 async function ProductsList({ searchParams }: { searchParams: SearchParams }) {
   try {
     const params: any = {
@@ -111,6 +124,12 @@ function ProductsSkeletonGrid() {
   );
 }
 
+/**
+ * Render the Products page with header, breadcrumbs, and product listings driven by incoming query parameters.
+ *
+ * @param searchParams - A Promise resolving to the raw Next.js query parameters (string or string[] values) provided to the page; used to determine filters such as search, category, featured, on_sale, and page.
+ * @returns The page UI containing breadcrumbs, a dynamic title and subtitle, and a products grid (or skeleton fallback) reflecting the provided search filters.
+ */
 export default async function ProductsPage({
   searchParams,
 }: {

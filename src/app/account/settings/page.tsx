@@ -17,6 +17,15 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ExtendedUser } from "@/types/better-auth";
 
+/**
+ * Renders the account settings page for viewing and updating the authenticated user's personal and address information.
+ *
+ * Shows a centered loading indicator while authentication is pending, returns `null` when unauthenticated, and otherwise
+ * displays a form pre-filled with the user's profile (name, phone, company, address fields, state, country) and controls
+ * to save or cancel changes.
+ *
+ * @returns The React element for the account settings UI; `null` if no session, and a loading indicator while authentication is pending.
+ */
 export default function SettingsPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();

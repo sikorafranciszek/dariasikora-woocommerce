@@ -16,6 +16,15 @@ import {
 import { toast } from "sonner";
 import Link from "next/link";
 
+/**
+ * Render a registration form for creating a new user account.
+ *
+ * Performs client-side validation for matching passwords and minimum length,
+ * displays success and error toasts, disables inputs during submission, and
+ * redirects to the login page after successful registration.
+ *
+ * @returns A React element containing the registration form UI.
+ */
 export function RegisterForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({

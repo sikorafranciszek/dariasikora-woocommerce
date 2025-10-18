@@ -14,6 +14,17 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+/**
+ * Render payment result UI based on a Stripe Checkout session ID.
+ *
+ * Renders an error card when no session ID is provided, a verification error
+ * card when session verification fails, a buffering card while payment is
+ * pending, and a success card with payment details when the session is paid.
+ *
+ * @param sessionId - The Stripe Checkout session ID to verify; pass `undefined`
+ *   when no session ID is available.
+ * @returns A React element containing the appropriate payment-status user interface.
+ */
 async function SuccessContent({
   sessionId,
 }: {
@@ -198,6 +209,12 @@ async function SuccessContent({
   );
 }
 
+/**
+ * Render the checkout success page using the provided search parameters to verify and display payment session status.
+ *
+ * @param searchParams - A promise that resolves to the page's query parameters; expected to include `session_id` when present.
+ * @returns A React element that shows a loading fallback while the session ID is parsed and then renders the success content for the parsed `session_id`.
+ */
 export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
   const { session_id } = searchParamsCache.parse(await searchParams);
 

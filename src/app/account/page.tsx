@@ -17,6 +17,13 @@ import { useSession, signOut } from "@/lib/auth-client";
 import { toast } from "sonner";
 import type { ExtendedUser } from "@/types/better-auth";
 
+/**
+ * Render the authenticated user's account page with sidebar navigation, an orders overview, and profile details.
+ *
+ * The component redirects unauthenticated users to "/login" once session loading completes, displays a centered loader while the session is pending, and provides a sign-out action that shows success or error toasts and navigates to the home page on successful sign-out.
+ *
+ * @returns A JSX element representing the account page.
+ */
 export default function AccountPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
