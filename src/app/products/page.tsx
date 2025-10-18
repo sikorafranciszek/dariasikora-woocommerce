@@ -1,10 +1,15 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { getProducts } from '@/lib/woocommerce';
-import { ProductCard } from '@/components/products/product-card';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { createSearchParamsCache, parseAsString, parseAsInteger, parseAsBoolean } from 'nuqs/server';
+import { Suspense } from "react";
+import Link from "next/link";
+import { getProducts } from "@/lib/woocommerce";
+import { ProductCard } from "@/components/products/product-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  createSearchParamsCache,
+  parseAsString,
+  parseAsInteger,
+  parseAsBoolean,
+} from "nuqs/server";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -12,7 +17,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
+} from "@/components/ui/breadcrumb";
 
 const searchParamsCache = createSearchParamsCache({
   search: parseAsString,
@@ -22,7 +27,7 @@ const searchParamsCache = createSearchParamsCache({
   page: parseAsInteger.withDefault(1),
 });
 
-type SearchParams = ReturnType<typeof searchParamsCache.parse>;
+type SearchParams = Awaited<ReturnType<typeof searchParamsCache.parse>>;
 
 async function ProductsList({ searchParams }: { searchParams: SearchParams }) {
   try {
@@ -53,7 +58,9 @@ async function ProductsList({ searchParams }: { searchParams: SearchParams }) {
       return (
         <Card className="p-12 text-center bg-muted/30">
           <div className="max-w-md mx-auto">
-            <h2 className="text-2xl font-bold mb-3 text-foreground">No products found</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">
+              No products found
+            </h2>
             <p className="text-muted-foreground leading-relaxed">
               Try changing your search criteria or browse all products
             </p>
@@ -70,13 +77,16 @@ async function ProductsList({ searchParams }: { searchParams: SearchParams }) {
       </div>
     );
   } catch (error) {
-    console.error('Error loading products:', error);
+    console.error("Error loading products:", error);
     return (
       <Card className="p-12 text-center bg-destructive/10 border-destructive/20">
         <div className="max-w-md mx-auto">
-          <p className="text-destructive font-semibold text-lg mb-2">Error loading products</p>
+          <p className="text-destructive font-semibold text-lg mb-2">
+            Error loading products
+          </p>
           <p className="text-sm text-muted-foreground">
-            Make sure you have correctly configured your WooCommerce connection in the .env.local file
+            Make sure you have correctly configured your WooCommerce connection
+            in the .env.local file
           </p>
         </div>
       </Card>
@@ -108,18 +118,18 @@ export default async function ProductsPage({
 }) {
   const params = searchParamsCache.parse(await searchParams);
 
-  let title = 'All Products';
-  let subtitle = 'Browse our wide selection of handmade primitive dolls';
+  let title = "All Products";
+  let subtitle = "Browse our wide selection of handmade primitive dolls";
 
   if (params.search) {
     title = `Search results: "${params.search}"`;
-    subtitle = 'Products matching your query';
+    subtitle = "Products matching your query";
   } else if (params.featured) {
-    title = 'Featured Products';
-    subtitle = 'Handpicked dolls just for you';
+    title = "Featured Products";
+    subtitle = "Handpicked dolls just for you";
   } else if (params.on_sale) {
-    title = 'On Sale';
-    subtitle = 'Great deals and special offers';
+    title = "On Sale";
+    subtitle = "Great deals and special offers";
   }
 
   return (
@@ -169,7 +179,9 @@ export default async function ProductsPage({
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         <div className="mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 text-foreground tracking-tight">{title}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 text-foreground tracking-tight">
+            {title}
+          </h1>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
             {subtitle}
           </p>

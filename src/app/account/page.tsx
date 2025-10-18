@@ -1,14 +1,21 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { User, Package, Settings, LogOut, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useSession, signOut } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { User, Package, Settings, LogOut, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession, signOut } from "@/lib/auth-client";
+import { toast } from "sonner";
+import type { ExtendedUser } from "@/types/better-auth";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -16,17 +23,17 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (!isPending && !session) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [session, isPending, router]);
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast.success('Logged out successfully');
-      router.push('/');
+      toast.success("Logged out successfully");
+      router.push("/");
     } catch (error) {
-      toast.error('Logout error');
+      toast.error("Logout error");
     }
   };
 
@@ -42,7 +49,7 @@ export default function AccountPage() {
     return null;
   }
 
-  const user = session.user;
+  const user = session.user as ExtendedUser;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -59,14 +66,20 @@ export default function AccountPage() {
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white">
                   {user.image ? (
-                    <img src={user.image} alt={user.name || 'User'} className="h-16 w-16 rounded-full" />
+                    <img
+                      src={user.image}
+                      alt={user.name || "User"}
+                      className="h-16 w-16 rounded-full"
+                    />
                   ) : (
                     <User className="h-8 w-8" />
                   )}
                 </div>
                 <div>
-                  <CardTitle>{user.name || 'User'}</CardTitle>
-                  <CardDescription className="break-all">{user.email}</CardDescription>
+                  <CardTitle>{user.name || "User"}</CardTitle>
+                  <CardDescription className="break-all">
+                    {user.email}
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -109,7 +122,9 @@ export default function AccountPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Orders</CardTitle>
-                  <CardDescription>Your recent orders from WooCommerce</CardDescription>
+                  <CardDescription>
+                    Your recent orders from WooCommerce
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-8 text-gray-600">
@@ -133,7 +148,9 @@ export default function AccountPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-500">Full Name</p>
-                      <p className="font-medium">{user.name || 'Not provided'}</p>
+                      <p className="font-medium">
+                        {user.name || "Not provided"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
