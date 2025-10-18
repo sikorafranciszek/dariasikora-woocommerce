@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bunx shadcn@latest add button card input label select textarea badge avatar dialog dropdown-menu sheet separator skeleton toast tabs accordion carousel)",
+      "Bash(bunx shadcn@latest add button card input label select textarea badge avatar dialog dropdown-menu sheet separator skeleton sonner tabs accordion carousel)",
+      "Bash(bun add date-fns)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
