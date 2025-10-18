@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
-import { CheckCircle, Loader2, XCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { verifyStripeSession } from '@/app/checkout/stripe-actions';
-import { createSearchParamsCache, parseAsString } from 'nuqs/server';
+import { Suspense } from "react";
+import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { verifyStripeSession } from "@/app/checkout/stripe-actions";
+import { createSearchParamsCache, parseAsString } from "nuqs/server";
 
 const searchParamsCache = createSearchParamsCache({
   session_id: parseAsString,
@@ -14,7 +14,11 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-async function SuccessContent({ sessionId }: { sessionId: string | undefined }) {
+async function SuccessContent({
+  sessionId,
+}: {
+  sessionId: string | undefined;
+}) {
   if (!sessionId) {
     return (
       <div className="container mx-auto px-4 py-16 max-w-2xl">
@@ -27,7 +31,8 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              Nie znaleziono sesji płatności. Link może być nieprawidłowy lub wygasł.
+              Nie znaleziono sesji płatności. Link może być nieprawidłowy lub
+              wygasł.
             </p>
             <div className="flex gap-4">
               <Button asChild>
@@ -52,12 +57,15 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
           <CardHeader>
             <div className="flex items-center gap-3">
               <XCircle className="h-12 w-12 text-red-500" />
-              <CardTitle className="text-2xl">Błąd weryfikacji płatności</CardTitle>
+              <CardTitle className="text-2xl">
+                Błąd weryfikacji płatności
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              {result.error || 'Nie udało się zweryfikować płatności. Skontaktuj się z obsługą klienta.'}
+              {result.error ||
+                "Nie udało się zweryfikować płatności. Skontaktuj się z obsługą klienta."}
             </p>
             <div className="flex gap-4">
               <Button asChild>
@@ -74,7 +82,7 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
   }
 
   const { session } = result;
-  const isPaid = session.payment_status === 'paid';
+  const isPaid = session.payment_status === "paid";
 
   if (!isPaid) {
     return (
@@ -83,15 +91,19 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
           <CardHeader>
             <div className="flex items-center gap-3">
               <Loader2 className="h-12 w-12 text-yellow-500 animate-spin" />
-              <CardTitle className="text-2xl">Oczekiwanie na płatność</CardTitle>
+              <CardTitle className="text-2xl">
+                Oczekiwanie na płatność
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              Twoja płatność jest w trakcie przetwarzania. Zamówienie zostanie utworzone po potwierdzeniu płatności.
+              Twoja płatność jest w trakcie przetwarzania. Zamówienie zostanie
+              utworzone po potwierdzeniu płatności.
             </p>
             <p className="text-sm text-gray-500">
-              Otrzymasz wiadomość email z potwierdzeniem zamówienia na adres: <strong>{session.customer_email}</strong>
+              Otrzymasz wiadomość email z potwierdzeniem zamówienia na adres:{" "}
+              <strong>{session.customer_email}</strong>
             </p>
             <div className="flex gap-4">
               <Button variant="outline" asChild>
@@ -104,12 +116,15 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
     );
   }
 
-  const formatPrice = (amountInCents: number | null, currency: string | null) => {
-    if (amountInCents === null) return 'N/A';
+  const formatPrice = (
+    amountInCents: number | null,
+    currency: string | null
+  ) => {
+    if (amountInCents === null) return "N/A";
     const amount = amountInCents / 100;
-    return new Intl.NumberFormat('pl-PL', {
-      style: 'currency',
-      currency: currency?.toUpperCase() || 'PLN',
+    return new Intl.NumberFormat("pl-PL", {
+      style: "currency",
+      currency: currency?.toUpperCase() || "PLN",
     }).format(amount);
   };
 
@@ -119,7 +134,9 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
         <CardHeader>
           <div className="flex items-center gap-3">
             <CheckCircle className="h-12 w-12 text-green-500" />
-            <CardTitle className="text-2xl">Płatność zakończona pomyślnie!</CardTitle>
+            <CardTitle className="text-2xl">
+              Płatność zakończona pomyślnie!
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -149,17 +166,21 @@ async function SuccessContent({ sessionId }: { sessionId: string | undefined }) 
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">ID sesji:</span>
-                <span className="text-gray-500 font-mono text-xs">{session.id}</span>
+                <span className="text-gray-500 font-mono text-xs">
+                  {session.id}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="border-t pt-4">
             <p className="text-sm text-gray-600 mb-4">
-              Potwierdzenie zamówienia zostało wysłane na adres email: <strong>{session.customer_email}</strong>
+              Potwierdzenie zamówienia zostało wysłane na adres email:{" "}
+              <strong>{session.customer_email}</strong>
             </p>
             <p className="text-sm text-gray-600 mb-4">
-              Zamówienie zostanie utworzone w naszym systemie w ciągu kilku minut. Możesz sprawdzić jego status w panelu klienta.
+              Zamówienie zostanie utworzone w naszym systemie w ciągu kilku
+              minut. Możesz sprawdzić jego status w panelu klienta.
             </p>
           </div>
 
@@ -187,13 +208,15 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
           <Card>
             <CardContent className="flex items-center justify-center py-12">
               <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
-              <span className="ml-3 text-gray-600">Weryfikacja płatności...</span>
+              <span className="ml-3 text-gray-600">
+                Weryfikacja płatności...
+              </span>
             </CardContent>
           </Card>
         </div>
       }
     >
-      <SuccessContent sessionId={session_id} />
+      <SuccessContent sessionId={session_id || undefined} />
     </Suspense>
   );
 }
