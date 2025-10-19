@@ -1,0 +1,41 @@
+# robots.txt for dariasikora.pl
+# Generated for My Primitive Dolls
+
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /account/
+Disallow: /checkout/
+Disallow: /cart
+
+# Allow specific pages
+Allow: /products
+Allow: /categories
+Allow: /about
+Allow: /contact
+
+# Sitemap location
+Sitemap: https://dariasikora.pl/sitemap.xml
+Sitemap: https://dariasikora.pl/sitemap-0.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1
+
+# Special rules for major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block common bad bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10

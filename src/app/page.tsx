@@ -12,28 +12,30 @@ import { ProductCard } from "@/components/products/product-card";
 import { getProducts, getCategories } from "@/lib/woocommerce";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LocalBusinessSchema } from "@/components/seo/local-business-schema";
+import { WebsiteSchema } from "@/components/seo/website-schema";
 
-async function FeaturedProducts() {
+async function NewestProducts() {
   try {
-    const products = await getProducts({ featured: true, per_page: 8 });
+    const products = await getProducts({ per_page: 5, orderby: 'date', order: 'desc' });
 
     if (!products || products.length === 0) {
       return (
         <div className="text-center py-12">
-          <p className="text-gray-600">No featured products</p>
+          <p className="text-gray-600">No products available</p>
         </div>
       );
     }
 
     return (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
     );
   } catch (error) {
-    console.error("Error loading featured products:", error);
+    console.error("Error loading newest products:", error);
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Error loading products</p>
@@ -90,8 +92,8 @@ async function Categories() {
 
 function ProductSkeleton() {
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {[...Array(8)].map((_, i) => (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      {[...Array(5)].map((_, i) => (
         <Card key={i}>
           <Skeleton className="aspect-square rounded-t-lg" />
           <CardContent className="p-4 space-y-2">
@@ -107,8 +109,11 @@ function ProductSkeleton() {
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col">
-      {/* Hero Section */}
+    <>
+      <LocalBusinessSchema />
+      <WebsiteSchema />
+      <div className="flex flex-col">
+        {/* Hero Section */}
       <section className="relative bg-primary/5 border-b border-border/40 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"></div>
         <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-24 lg:py-32 text-center">
@@ -194,23 +199,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Newest Products */}
       <section className="bg-muted/30 py-12 sm:py-16 lg:py-24 border-y border-border/40">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-foreground tracking-tight mb-1 sm:mb-2">Featured Products</h2>
-              <p className="text-muted-foreground text-sm sm:text-base">Handpicked dolls just for you</p>
+              <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-foreground tracking-tight mb-1 sm:mb-2">Newest Products</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">Discover our latest handmade dolls</p>
             </div>
             <Button asChild variant="outline" className="hidden sm:flex">
-              <Link href="/products?featured=true">
+              <Link href="/products">
                 View All
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
           <Suspense fallback={<ProductSkeleton />}>
-            <FeaturedProducts />
+            <NewestProducts />
           </Suspense>
         </div>
       </section>
@@ -242,5 +247,6 @@ export default function HomePage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

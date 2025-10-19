@@ -22,16 +22,56 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Primitive Dolls - Handmade Primitive Dolls",
+  title: "My Primitive Dolls - Unique Handmade Art Dolls by Daria Sikora",
   description:
-    "Unique handmade primitive dolls crafted with passion and traditional techniques by Daria Sikora",
+    "Discover unique handmade primitive dolls crafted with passion and traditional techniques. Each doll is one-of-a-kind, created by Polish artist Daria Sikora. Worldwide shipping available.",
   keywords: [
     "primitive dolls",
     "handmade dolls",
     "art dolls",
-    "handcrafted",
+    "handcrafted dolls",
     "daria sikora",
+    "unique dolls",
+    "collectible dolls",
+    "folk art dolls",
   ],
+  authors: [{ name: "Daria Sikora" }],
+  creator: "Daria Sikora",
+  publisher: "My Primitive Dolls",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://dariasikora.pl'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "My Primitive Dolls - Unique Handmade Art Dolls",
+    description: "Discover unique handmade primitive dolls crafted with passion and traditional techniques. Each doll is one-of-a-kind, created by Polish artist Daria Sikora.",
+    url: 'https://dariasikora.pl',
+    siteName: 'My Primitive Dolls',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "My Primitive Dolls - Unique Handmade Art Dolls",
+    description: "Discover unique handmade primitive dolls crafted with passion and traditional techniques by Daria Sikora.",
+    creator: '@myprimitivedolls',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
