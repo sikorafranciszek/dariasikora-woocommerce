@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { TurnstileComponent } from "./turnstile";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -25,9 +26,15 @@ export function RegisterForm() {
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      toast.error("Please complete the security verification");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
@@ -128,7 +135,27 @@ export function RegisterForm() {
               disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+
+          <TurnstileComponent
+            onVerify={(token) => setTurnstileToken(token)}
+            onError={() => {
+              setTurnstileToken(null);
+              toast.error("Security verification failed. Please try again.");
+            }}
+            onExpire={() => {
+              setTurnstileToken(null);
+              toast.warning(
+                "Security verification expired. Please verify again."
+              );
+            }}
+            className="flex justify-center"
+          />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || !turnstileToken}
+          >
             {isLoading ? "Creating account..." : "Register"}
           </Button>
         </form>
