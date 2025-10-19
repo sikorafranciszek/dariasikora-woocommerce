@@ -1,23 +1,37 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { signIn } from '@/lib/auth-client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { TurnstileComponent } from "./turnstile";
+import { toast } from "sonner";
+import Link from "next/link";
 
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      toast.error("Please complete the security verification");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -26,12 +40,12 @@ export function LoginForm() {
         password,
       });
 
-      toast.success('Logged in successfully!');
-      router.push('/account');
+      toast.success("Logged in successfully!");
+      router.push("/account");
       router.refresh();
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Login error. Check your email and password.');
+      console.error("Login error:", error);
+      toast.error("Login error. Check your email and password.");
     } finally {
       setIsLoading(false);
     }
@@ -69,12 +83,32 @@ export function LoginForm() {
               disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+
+          <TurnstileComponent
+            onVerify={(token) => setTurnstileToken(token)}
+            onError={() => {
+              setTurnstileToken(null);
+              toast.error("Security verification failed. Please try again.");
+            }}
+            onExpire={() => {
+              setTurnstileToken(null);
+              toast.warning(
+                "Security verification expired. Please verify again."
+              );
+            }}
+            className="flex justify-center"
+          />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || !turnstileToken}
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link href="/register" className="text-primary hover:underline">
             Register
           </Link>

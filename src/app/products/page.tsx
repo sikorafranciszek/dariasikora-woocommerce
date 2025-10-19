@@ -146,7 +146,9 @@ export default async function ProductsPage({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Products</BreadcrumbPage>
+                <BreadcrumbPage>
+                  <Link href="/products">Products</Link>
+                </BreadcrumbPage>
               </BreadcrumbItem>
               {params.search && (
                 <>
