@@ -60,55 +60,58 @@ export function Header() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] sm:w-[320px]">
-            <nav className="flex flex-col gap-6 mt-8">
-              <Link href="/" className="font-bold text-xl text-foreground tracking-tight mb-4">
+          <SheetContent side="left" className="w-[280px] sm:w-[320px] px-6">
+            <nav className="flex flex-col gap-4 mt-8">
+              <Link href="/" className="font-bold text-xl text-foreground tracking-tight mb-2 px-2">
                 My Primitive Dolls
               </Link>
-              <Link
-                href="/products"
-                className="text-base font-medium text-foreground hover:text-primary transition-colors flex items-center py-2 border-b border-border/30"
-              >
-                Products
-              </Link>
-              <Link
-                href="/about"
-                className="text-base font-medium text-foreground hover:text-primary transition-colors flex items-center py-2 border-b border-border/30"
-              >
-                About Me
-              </Link>
-              <Link
-                href="/contact"
-                className="text-base font-medium text-foreground hover:text-primary transition-colors flex items-center py-2 border-b border-border/30"
-              >
-                Contact
-              </Link>
+
+              <div className="flex flex-col gap-1">
+                <Link
+                  href="/products"
+                  className="text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 transition-all flex items-center py-3 px-4 rounded-lg border-b border-border/30"
+                >
+                  Products
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 transition-all flex items-center py-3 px-4 rounded-lg border-b border-border/30"
+                >
+                  About Me
+                </Link>
+                <Link
+                  href="/contact"
+                  className="text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 transition-all flex items-center py-3 px-4 rounded-lg border-b border-border/30"
+                >
+                  Contact
+                </Link>
+              </div>
 
               {/* Mobile User Menu */}
-              <div className="mt-6 pt-6 border-t border-border/50">
+              <div className="mt-8 pt-6 border-t border-border/50">
                 {session ? (
-                  <div className="space-y-4">
-                    <div className="px-3 py-2 bg-muted/50 rounded-lg">
+                  <div className="space-y-3">
+                    <div className="px-4 py-3 bg-muted/50 rounded-lg">
                       <p className="text-sm font-medium text-foreground">{session.user.name || 'User'}</p>
                       <p className="text-xs text-muted-foreground truncate mt-1">{session.user.email}</p>
                     </div>
                     <Link
                       href="/account"
-                      className="flex items-center gap-3 text-base font-medium text-foreground hover:text-primary transition-colors py-2"
+                      className="flex items-center gap-3 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 transition-all py-3 px-4 rounded-lg"
                     >
                       <User className="h-5 w-5" />
                       My Account
                     </Link>
                     <Link
                       href="/account/orders"
-                      className="flex items-center gap-3 text-base font-medium text-foreground hover:text-primary transition-colors py-2"
+                      className="flex items-center gap-3 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 transition-all py-3 px-4 rounded-lg"
                     >
                       <ShoppingCart className="h-5 w-5" />
                       Orders
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center gap-3 text-base font-medium text-destructive hover:text-destructive/80 transition-colors py-2 w-full"
+                      className="flex items-center gap-3 text-base font-medium text-destructive hover:text-destructive/80 hover:bg-destructive/5 transition-all py-3 px-4 rounded-lg w-full text-left"
                     >
                       <LogOut className="h-5 w-5" />
                       Sign Out
@@ -117,7 +120,7 @@ export function Header() {
                 ) : (
                   <Link
                     href="/login"
-                    className="flex items-center gap-3 text-base font-medium text-foreground hover:text-primary transition-colors py-2"
+                    className="flex items-center gap-3 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5 transition-all py-3 px-4 rounded-lg"
                   >
                     <LogIn className="h-5 w-5" />
                     Sign In
