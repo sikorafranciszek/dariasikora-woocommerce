@@ -181,17 +181,9 @@ export default function HomePage() {
       {/* Categories */}
       <section className="py-12 sm:py-16 lg:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-foreground tracking-tight mb-1 sm:mb-2">Popular Categories</h2>
-              <p className="text-muted-foreground text-sm sm:text-base">Find what you're looking for</p>
-            </div>
-            <Button asChild variant="outline" className="hidden sm:flex">
-              <Link href="/categories">
-                View All
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+          <div className="mb-8 sm:mb-10">
+            <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-foreground tracking-tight mb-1 sm:mb-2">Popular Categories</h2>
+            <p className="text-muted-foreground text-sm sm:text-base">Find what you're looking for</p>
           </div>
           <Suspense fallback={<div className="text-muted-foreground text-sm">Loading categories...</div>}>
             <Categories />

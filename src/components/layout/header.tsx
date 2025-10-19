@@ -72,12 +72,6 @@ export function Header() {
                 Products
               </Link>
               <Link
-                href="/categories"
-                className="text-base font-medium text-foreground hover:text-primary transition-colors flex items-center py-2 border-b border-border/30"
-              >
-                Categories
-              </Link>
-              <Link
                 href="/about"
                 className="text-base font-medium text-foreground hover:text-primary transition-colors flex items-center py-2 border-b border-border/30"
               >
@@ -144,10 +138,6 @@ export function Header() {
         <nav className="ml-10 hidden gap-8 lg:flex items-center">
           <Link href="/products" className="text-sm font-medium transition-colors hover:text-primary relative group">
             Products
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-          </Link>
-          <Link href="/categories" className="text-sm font-medium transition-colors hover:text-primary relative group">
-            Categories
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
           </Link>
           <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary relative group">

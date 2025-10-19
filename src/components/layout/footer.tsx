@@ -51,11 +51,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/categories" className="hover:text-primary transition-colors hover:pl-1 inline-block">
-                  Categories
-                </Link>
-              </li>
-              <li>
                 <Link href="/products?featured=true" className="hover:text-primary transition-colors hover:pl-1 inline-block">
                   Featured
                 </Link>
