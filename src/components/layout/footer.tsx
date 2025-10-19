@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Facebook, Instagram, Twitter, Mail } from 'lucide-react';
+import { Facebook, Instagram, Mail } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export function Footer() {
@@ -15,25 +15,23 @@ export function Footer() {
             </p>
             <div className="flex gap-2 sm:gap-3">
               <Link
-                href="#"
+                href="https://www.facebook.com/MyPrimitiveDolls/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-1.5 sm:p-2 rounded-lg hover:bg-primary/10"
               >
                 <Facebook className="h-4 w-4 sm:h-5 sm:w-5" />
               </Link>
               <Link
-                href="#"
+                href="https://www.instagram.com/myprimitivedolls/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-1.5 sm:p-2 rounded-lg hover:bg-primary/10"
               >
                 <Instagram className="h-4 w-4 sm:h-5 sm:w-5" />
               </Link>
               <Link
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-1.5 sm:p-2 rounded-lg hover:bg-primary/10"
-              >
-                <Twitter className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Link>
-              <Link
-                href="#"
+                href="/contact"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-1.5 sm:p-2 rounded-lg hover:bg-primary/10"
               >
                 <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
