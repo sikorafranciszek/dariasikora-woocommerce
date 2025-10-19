@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { NuqsProvider } from "@/components/providers/nuqs-provider";
 import { CookieBanner } from "@/components/cookie/cookie-banner";
 import { CookieSettingsButton } from "@/components/cookie/cookie-settings-button";
+import { GoogleTagManager } from "@/components/analytics/google-tag-manager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,8 +23,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "My Primitive Dolls - Handmade Primitive Dolls",
-  description: "Unique handmade primitive dolls crafted with passion and traditional techniques by Daria Sikora",
-  keywords: ["primitive dolls", "handmade dolls", "art dolls", "handcrafted", "daria sikora"],
+  description:
+    "Unique handmade primitive dolls crafted with passion and traditional techniques by Daria Sikora",
+  keywords: [
+    "primitive dolls",
+    "handmade dolls",
+    "art dolls",
+    "handcrafted",
+    "daria sikora",
+  ],
 };
 
 export default function RootLayout({
@@ -36,6 +44,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GA_ID || ""} />
         <NuqsProvider>
           <div className="flex min-h-screen flex-col">
             <Header />
