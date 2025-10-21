@@ -24,16 +24,16 @@ const checkoutSchema = z.object({
   // Billing
   billing_first_name: z
     .string()
-    .min(2, "First name must be at least 2 characters"),
+    .min(2, "Imię musi mieć co najmniej 2 znaki"),
   billing_last_name: z
     .string()
-    .min(2, "Last name must be at least 2 characters"),
-  billing_email: z.string().email("Invalid email address"),
-  billing_phone: z.string().min(9, "Invalid phone number"),
-  billing_address_1: z.string().min(5, "Address is required"),
+    .min(2, "Nazwisko musi mieć co najmniej 2 znaki"),
+  billing_email: z.string().email("Nieprawidłowy adres email"),
+  billing_phone: z.string().min(9, "Nieprawidłowy numer telefonu"),
+  billing_address_1: z.string().min(5, "Adres jest wymagany"),
   billing_address_2: z.string().optional(),
-  billing_city: z.string().min(2, "City is required"),
-  billing_postcode: z.string().min(5, "Postal code is required"),
+  billing_city: z.string().min(2, "Miasto jest wymagane"),
+  billing_postcode: z.string().min(5, "Kod pocztowy jest wymagany"),
   billing_state: z.string().optional(),
   billing_country: z.string(),
   billing_company: z.string().optional(),
@@ -74,8 +74,6 @@ export function CheckoutFormClient({
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<WooCommerceCoupon | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-
-  console.log("Payment Gateways:", paymentGateways);
 
   const {
     register,
@@ -292,14 +290,14 @@ export function CheckoutFormClient({
 
       if (result.success && result.order) {
         clearCart();
-        toast.success("Order placed successfully!");
+        toast.success("Zamówienie złożone pomyślnie!");
         router.push(`/order-confirmation/${result.order.id}`);
       } else {
-        toast.error(result.error || "Error placing order. Please try again.");
+        toast.error(result.error || "Błąd składania zamówienia. Spróbuj ponownie.");
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      toast.error("Error placing order. Please try again.");
+      toast.error("Błąd składania zamówienia. Spróbuj ponownie.");
     } finally {
       setIsSubmitting(false);
     }
@@ -335,12 +333,12 @@ export function CheckoutFormClient({
           {/* Billing Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Billing Information</CardTitle>
+              <CardTitle>Dane do faktury</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="billing_first_name">First Name *</Label>
+                  <Label htmlFor="billing_first_name">Imię *</Label>
                   <Input
                     id="billing_first_name"
                     {...register("billing_first_name")}
@@ -356,7 +354,7 @@ export function CheckoutFormClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="billing_last_name">Last Name *</Label>
+                  <Label htmlFor="billing_last_name">Nazwisko *</Label>
                   <Input
                     id="billing_last_name"
                     {...register("billing_last_name")}
@@ -371,7 +369,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_company">Company Name (optional)</Label>
+                <Label htmlFor="billing_company">Nazwa firmy (opcjonalne)</Label>
                 <Input id="billing_company" {...register("billing_company")} />
               </div>
 
@@ -391,7 +389,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_phone">Phone *</Label>
+                <Label htmlFor="billing_phone">Telefon *</Label>
                 <Input
                   id="billing_phone"
                   type="tel"
@@ -406,7 +404,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_address_1">Address *</Label>
+                <Label htmlFor="billing_address_1">Adres *</Label>
                 <Input
                   id="billing_address_1"
                   {...register("billing_address_1")}
@@ -420,7 +418,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_address_2">Address (line 2)</Label>
+                <Label htmlFor="billing_address_2">Adres (linia 2)</Label>
                 <Input
                   id="billing_address_2"
                   {...register("billing_address_2")}
@@ -429,7 +427,7 @@ export function CheckoutFormClient({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="billing_city">City *</Label>
+                  <Label htmlFor="billing_city">Miasto *</Label>
                   <Input
                     id="billing_city"
                     {...register("billing_city")}
@@ -443,7 +441,7 @@ export function CheckoutFormClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="billing_postcode">Postal Code *</Label>
+                  <Label htmlFor="billing_postcode">Kod pocztowy *</Label>
                   <Input
                     id="billing_postcode"
                     {...register("billing_postcode")}
@@ -462,7 +460,7 @@ export function CheckoutFormClient({
           {/* Payment Method */}
           <Card>
             <CardHeader>
-              <CardTitle>Payment Method</CardTitle>
+              <CardTitle>Metoda płatności</CardTitle>
             </CardHeader>
             <CardContent>
               <RadioGroup
@@ -648,9 +646,8 @@ export function CheckoutFormClient({
                 )}
               </Button>
 
-              <p className="text-center text-gray-600 text-xs">
-                By placing your order, you agree to our terms and privacy
-                policy.
+              <p className="text-center text-muted-foreground text-xs">
+                Składając zamówienie, akceptujesz nasz regulamin i politykę prywatności.
               </p>
             </CardContent>
           </Card>
