@@ -52,7 +52,9 @@ export default function ContactPage() {
         `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
       )}`;
 
-      window.location.href = mailtoLink;
+      if (typeof window !== 'undefined') {
+        window.location.href = mailtoLink;
+      }
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });

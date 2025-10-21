@@ -131,7 +131,7 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
     }
 
     // Map payment method types
-    const getStripePaymentMethods = (methodType?: string): string[] => {
+    const getStripePaymentMethods = (methodType?: string): Stripe.Checkout.SessionCreateParams.PaymentMethodType[] => {
       switch (methodType) {
         case 'stripe_blik':
           return ['blik'];

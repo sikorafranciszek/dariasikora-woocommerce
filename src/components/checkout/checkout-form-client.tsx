@@ -226,7 +226,9 @@ export function CheckoutFormClient({
           clearCart();
           toast.success("Przekierowanie do płatności...");
           // Redirect to Stripe Checkout (checkout.stripe.com)
-          window.location.href = result.url;
+          if (typeof window !== 'undefined') {
+            window.location.href = result.url;
+          }
         } else {
           toast.error(
             result.error || "Błąd tworzenia sesji płatności. Spróbuj ponownie."
