@@ -24,16 +24,16 @@ const checkoutSchema = z.object({
   // Billing
   billing_first_name: z
     .string()
-    .min(2, "Imię musi mieć co najmniej 2 znaki"),
+    .min(2, "First name must be at least 2 characters"),
   billing_last_name: z
     .string()
-    .min(2, "Nazwisko musi mieć co najmniej 2 znaki"),
-  billing_email: z.string().email("Nieprawidłowy adres email"),
-  billing_phone: z.string().min(9, "Nieprawidłowy numer telefonu"),
-  billing_address_1: z.string().min(5, "Adres jest wymagany"),
+    .min(2, "Last name must be at least 2 characters"),
+  billing_email: z.string().email("Invalid email address"),
+  billing_phone: z.string().min(9, "Invalid phone number"),
+  billing_address_1: z.string().min(5, "Address is required"),
   billing_address_2: z.string().optional(),
-  billing_city: z.string().min(2, "Miasto jest wymagane"),
-  billing_postcode: z.string().min(5, "Kod pocztowy jest wymagany"),
+  billing_city: z.string().min(2, "City is required"),
+  billing_postcode: z.string().min(5, "Postal code is required"),
   billing_state: z.string().optional(),
   billing_country: z.string(),
   billing_company: z.string().optional(),
@@ -121,7 +121,7 @@ export function CheckoutFormClient({
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
-      toast.error("Wprowadź kod kuponu");
+      toast.error("Enter coupon code");
       return;
     }
 
@@ -132,12 +132,12 @@ export function CheckoutFormClient({
 
       if (result.valid && result.coupon) {
         setAppliedCoupon(result.coupon);
-        toast.success("Kupon został zastosowany!");
+        toast.success("Coupon applied successfully!");
       } else {
-        toast.error(result.error || "Nieprawidłowy kupon");
+        toast.error(result.error || "Invalid coupon");
       }
     } catch (error) {
-      toast.error("Błąd przy sprawdzaniu kuponu");
+      toast.error("Error validating coupon");
     } finally {
       setIsValidatingCoupon(false);
     }
@@ -146,7 +146,7 @@ export function CheckoutFormClient({
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode("");
-    toast.success("Kupon został usunięty");
+    toast.success("Coupon removed");
   };
 
   const calculateDiscount = (subtotal: number): number => {
@@ -222,14 +222,14 @@ export function CheckoutFormClient({
 
         if (result.success && result.url) {
           clearCart();
-          toast.success("Przekierowanie do płatności...");
+          toast.success("Redirecting to payment...");
           // Redirect to Stripe Checkout (checkout.stripe.com)
           if (typeof window !== 'undefined') {
             window.location.href = result.url;
           }
         } else {
           toast.error(
-            result.error || "Błąd tworzenia sesji płatności. Spróbuj ponownie."
+            result.error || "Error creating payment session. Please try again."
           );
         }
         return;
@@ -290,14 +290,14 @@ export function CheckoutFormClient({
 
       if (result.success && result.order) {
         clearCart();
-        toast.success("Zamówienie złożone pomyślnie!");
+        toast.success("Order placed successfully!");
         router.push(`/order-confirmation/${result.order.id}`);
       } else {
-        toast.error(result.error || "Błąd składania zamówienia. Spróbuj ponownie.");
+        toast.error(result.error || "Error placing order. Please try again.");
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      toast.error("Błąd składania zamówienia. Spróbuj ponownie.");
+      toast.error("Error placing order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -333,12 +333,12 @@ export function CheckoutFormClient({
           {/* Billing Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Dane do faktury</CardTitle>
+              <CardTitle>Billing Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="billing_first_name">Imię *</Label>
+                  <Label htmlFor="billing_first_name">First Name *</Label>
                   <Input
                     id="billing_first_name"
                     {...register("billing_first_name")}
@@ -354,7 +354,7 @@ export function CheckoutFormClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="billing_last_name">Nazwisko *</Label>
+                  <Label htmlFor="billing_last_name">Last Name *</Label>
                   <Input
                     id="billing_last_name"
                     {...register("billing_last_name")}
@@ -369,7 +369,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_company">Nazwa firmy (opcjonalne)</Label>
+                <Label htmlFor="billing_company">Company Name (optional)</Label>
                 <Input id="billing_company" {...register("billing_company")} />
               </div>
 
@@ -389,7 +389,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_phone">Telefon *</Label>
+                <Label htmlFor="billing_phone">Phone *</Label>
                 <Input
                   id="billing_phone"
                   type="tel"
@@ -404,7 +404,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_address_1">Adres *</Label>
+                <Label htmlFor="billing_address_1">Address *</Label>
                 <Input
                   id="billing_address_1"
                   {...register("billing_address_1")}
@@ -418,7 +418,7 @@ export function CheckoutFormClient({
               </div>
 
               <div>
-                <Label htmlFor="billing_address_2">Adres (linia 2)</Label>
+                <Label htmlFor="billing_address_2">Address (line 2)</Label>
                 <Input
                   id="billing_address_2"
                   {...register("billing_address_2")}
@@ -427,7 +427,7 @@ export function CheckoutFormClient({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="billing_city">Miasto *</Label>
+                  <Label htmlFor="billing_city">City *</Label>
                   <Input
                     id="billing_city"
                     {...register("billing_city")}
@@ -441,7 +441,7 @@ export function CheckoutFormClient({
                 </div>
 
                 <div>
-                  <Label htmlFor="billing_postcode">Kod pocztowy *</Label>
+                  <Label htmlFor="billing_postcode">Postal Code *</Label>
                   <Input
                     id="billing_postcode"
                     {...register("billing_postcode")}
@@ -460,7 +460,7 @@ export function CheckoutFormClient({
           {/* Payment Method */}
           <Card>
             <CardHeader>
-              <CardTitle>Metoda płatności</CardTitle>
+              <CardTitle>Payment Method</CardTitle>
             </CardHeader>
             <CardContent>
               <RadioGroup
@@ -509,7 +509,7 @@ export function CheckoutFormClient({
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Twoje zamówienie</CardTitle>
+              <CardTitle>Your Order</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -537,20 +537,20 @@ export function CheckoutFormClient({
               <Separator />
 
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Suma częściowa:</span>
+                <span className="text-muted-foreground">Subtotal:</span>
                 <span className="font-semibold">{formatPrice(total)}</span>
               </div>
 
               {/* Coupon Section */}
               {!appliedCoupon ? (
                 <div className="space-y-2">
-                  <Label htmlFor="coupon">Kod kuponu</Label>
+                  <Label htmlFor="coupon">Coupon Code</Label>
                   <div className="flex gap-2">
                     <Input
                       id="coupon"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      placeholder="Wpisz kod"
+                      placeholder="Enter code"
                       disabled={isValidatingCoupon}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -602,16 +602,16 @@ export function CheckoutFormClient({
 
               {discount > 0 && (
                 <div className="flex justify-between text-green-600">
-                  <span className="text-muted-foreground">Rabat:</span>
+                  <span className="text-muted-foreground">Discount:</span>
                   <span className="font-semibold">-{formatPrice(discount)}</span>
                 </div>
               )}
 
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Dostawa:</span>
+                <span className="text-muted-foreground">Shipping:</span>
                 <span className="font-semibold">
                   {shippingCost === 0 ? (
-                    <span className="text-green-600">Darmowa</span>
+                    <span className="text-green-600">Free</span>
                   ) : (
                     formatPrice(shippingCost)
                   )}
@@ -621,7 +621,7 @@ export function CheckoutFormClient({
               <Separator />
 
               <div className="flex justify-between text-lg">
-                <span className="font-bold">Razem:</span>
+                <span className="font-bold">Total:</span>
                 <span className="font-bold">{formatPrice(finalTotal)}</span>
               </div>
 
@@ -634,20 +634,20 @@ export function CheckoutFormClient({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Przetwarzanie...
+                    Processing...
                   </>
                 ) : selectedPaymentMethod.startsWith("stripe") ? (
                   <>
                     <CreditCard className="mr-2 h-5 w-5" />
-                    Przejdź do płatności
+                    Proceed to Payment
                   </>
                 ) : (
-                  "Złóż zamówienie"
+                  "Place Order"
                 )}
               </Button>
 
               <p className="text-center text-muted-foreground text-xs">
-                Składając zamówienie, akceptujesz nasz regulamin i politykę prywatności.
+                By placing your order, you agree to our terms and privacy policy.
               </p>
             </CardContent>
           </Card>
