@@ -21,6 +21,9 @@ export async function createOrder(orderData: {
     quantity: number;
     variation_id?: number;
   }>;
+  coupon_lines?: Array<{
+    code: string;
+  }>;
   customer_id?: number;
   transaction_id?: string;
   meta_data?: Array<{ key: string; value: any }>;

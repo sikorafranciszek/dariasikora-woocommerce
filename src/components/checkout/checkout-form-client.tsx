@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, CreditCard, Banknote, Wallet } from "lucide-react";
+import { Loader2, CreditCard, Banknote, Wallet, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import { createOrder } from "@/app/checkout/actions";
 import { createStripeCheckoutSession } from "@/app/checkout/stripe-actions";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "sonner";
-import type { PaymentGateway } from "@/lib/woocommerce";
+import { validateCoupon, type PaymentGateway, type WooCommerceCoupon } from "@/lib/woocommerce";
 import type { ExtendedUser } from "@/types/better-auth";
 
 const checkoutSchema = z.object({
@@ -71,6 +71,11 @@ export function CheckoutFormClient({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
     paymentGateways[0]?.id || "bacs"
   );
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<WooCommerceCoupon | null>(null);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+
+  console.log("Payment Gateways:", paymentGateways);
 
   const {
     register,
@@ -116,9 +121,53 @@ export function CheckoutFormClient({
     }).format(price);
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error("Wprowadź kod kuponu");
+      return;
+    }
+
+    setIsValidatingCoupon(true);
+    try {
+      const productIds = items.map(item => item.product.id);
+      const result = await validateCoupon(couponCode.trim(), getTotal(), productIds);
+
+      if (result.valid && result.coupon) {
+        setAppliedCoupon(result.coupon);
+        toast.success("Kupon został zastosowany!");
+      } else {
+        toast.error(result.error || "Nieprawidłowy kupon");
+      }
+    } catch (error) {
+      toast.error("Błąd przy sprawdzaniu kuponu");
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    toast.success("Kupon został usunięty");
+  };
+
+  const calculateDiscount = (subtotal: number): number => {
+    if (!appliedCoupon) return 0;
+
+    if (appliedCoupon.discount_type === "percent") {
+      return (subtotal * parseFloat(appliedCoupon.amount)) / 100;
+    } else if (appliedCoupon.discount_type === "fixed_cart") {
+      return parseFloat(appliedCoupon.amount);
+    }
+
+    return 0;
+  };
+
   const total = getTotal();
-  const shippingCost = total >= 200 ? 0 : 15;
-  const finalTotal = total + shippingCost;
+  const discount = calculateDiscount(total);
+  const subtotalAfterDiscount = total - discount;
+  const shippingCost = appliedCoupon?.free_shipping ? 0 : (subtotalAfterDiscount >= 200 ? 0 : 15);
+  const finalTotal = subtotalAfterDiscount + shippingCost;
 
   if (items.length === 0) {
     router.push("/cart");
@@ -129,8 +178,10 @@ export function CheckoutFormClient({
     try {
       setIsSubmitting(true);
 
-      // If Stripe is selected, use Stripe Checkout Session directly
-      if (data.payment_method === "stripe") {
+      // If any Stripe payment method is selected, use Stripe Checkout Session
+      const isStripeMethod = data.payment_method.startsWith("stripe");
+
+      if (isStripeMethod) {
         const billingDetails = {
           first_name: data.billing_first_name,
           last_name: data.billing_last_name,
@@ -166,16 +217,19 @@ export function CheckoutFormClient({
           customerEmail: data.billing_email,
           billingDetails,
           shippingDetails,
+          paymentMethodType: data.payment_method,
+          couponCode: appliedCoupon?.code,
+          discountAmount: discount > 0 ? discount : undefined,
         });
 
         if (result.success && result.url) {
           clearCart();
-          toast.success("Redirecting to Stripe payment...");
+          toast.success("Przekierowanie do płatności...");
           // Redirect to Stripe Checkout (checkout.stripe.com)
           window.location.href = result.url;
         } else {
           toast.error(
-            result.error || "Error creating payment session. Please try again."
+            result.error || "Błąd tworzenia sesji płatności. Spróbuj ponownie."
           );
         }
         return;
@@ -229,6 +283,7 @@ export function CheckoutFormClient({
               country: data.billing_country,
             },
         line_items: lineItems,
+        coupon_lines: appliedCoupon ? [{ code: appliedCoupon.code }] : undefined,
       };
 
       const result = await createOrder(orderData);
@@ -414,29 +469,35 @@ export function CheckoutFormClient({
               >
                 <div className="space-y-3">
                   {paymentGateways.map((gateway) => (
-                    <div
+                    <label
                       key={gateway.id}
-                      className="flex items-start space-x-3 space-y-0"
+                      htmlFor={gateway.id}
+                      className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-primary/50 hover:bg-primary/5 ${
+                        selectedPaymentMethod === gateway.id
+                          ? "border-primary bg-primary/5"
+                          : "border-border"
+                      }`}
                     >
-                      <RadioGroupItem value={gateway.id} id={gateway.id} />
-                      <Label
-                        htmlFor={gateway.id}
-                        className="flex flex-1 flex-col cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2 font-semibold">
+                      <RadioGroupItem
+                        value={gateway.id}
+                        id={gateway.id}
+                        className="mt-0.5"
+                      />
+                      <div className="flex flex-1 flex-col ml-3">
+                        <div className="flex items-center gap-2 font-semibold text-foreground">
                           {getPaymentIcon(gateway.id)}
                           {gateway.title}
                         </div>
                         {gateway.description && (
                           <p
-                            className="text-gray-600 text-sm mt-1"
+                            className="text-muted-foreground text-sm mt-2 leading-relaxed"
                             dangerouslySetInnerHTML={{
                               __html: gateway.description,
                             }}
                           />
                         )}
-                      </Label>
-                    </div>
+                      </div>
+                    </label>
                   ))}
                 </div>
               </RadioGroup>
@@ -448,7 +509,7 @@ export function CheckoutFormClient({
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Your Order</CardTitle>
+              <CardTitle>Twoje zamówienie</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -476,21 +537,91 @@ export function CheckoutFormClient({
               <Separator />
 
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal:</span>
+                <span className="text-muted-foreground">Suma częściowa:</span>
                 <span className="font-semibold">{formatPrice(total)}</span>
               </div>
 
+              {/* Coupon Section */}
+              {!appliedCoupon ? (
+                <div className="space-y-2">
+                  <Label htmlFor="coupon">Kod kuponu</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="coupon"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="Wpisz kod"
+                      disabled={isValidatingCoupon}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleApplyCoupon}
+                      disabled={isValidatingCoupon}
+                    >
+                      {isValidatingCoupon ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Tag className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-800">
+                        {appliedCoupon.code}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemoveCoupon}
+                      className="h-6 w-6 p-0 hover:bg-green-100"
+                    >
+                      <X className="h-4 w-4 text-green-600" />
+                    </Button>
+                  </div>
+                  {appliedCoupon.description && (
+                    <p className="text-xs text-green-700 mt-1">
+                      {appliedCoupon.description}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {discount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span className="text-muted-foreground">Rabat:</span>
+                  <span className="font-semibold">-{formatPrice(discount)}</span>
+                </div>
+              )}
+
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping:</span>
+                <span className="text-muted-foreground">Dostawa:</span>
                 <span className="font-semibold">
-                  {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+                  {shippingCost === 0 ? (
+                    <span className="text-green-600">Darmowa</span>
+                  ) : (
+                    formatPrice(shippingCost)
+                  )}
                 </span>
               </div>
 
               <Separator />
 
               <div className="flex justify-between text-lg">
-                <span className="font-bold">Total:</span>
+                <span className="font-bold">Razem:</span>
                 <span className="font-bold">{formatPrice(finalTotal)}</span>
               </div>
 
@@ -503,15 +634,15 @@ export function CheckoutFormClient({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Processing...
+                    Przetwarzanie...
                   </>
-                ) : selectedPaymentMethod === "stripe" ? (
+                ) : selectedPaymentMethod.startsWith("stripe") ? (
                   <>
                     <CreditCard className="mr-2 h-5 w-5" />
-                    Proceed to payment
+                    Przejdź do płatności
                   </>
                 ) : (
-                  "Place order"
+                  "Złóż zamówienie"
                 )}
               </Button>
 

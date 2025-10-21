@@ -23,6 +23,9 @@ interface CreateCheckoutSessionData {
   customerEmail: string;
   billingDetails: BillingDetails;
   shippingDetails?: BillingDetails;
+  paymentMethodType?: string; // e.g., "stripe", "stripe_blik", "stripe_p24", "stripe_link"
+  couponCode?: string; // WooCommerce coupon code
+  discountAmount?: number; // Calculated discount amount
 }
 
 export async function createStripeCheckoutSession(data: CreateCheckoutSessionData) {
@@ -34,7 +37,13 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
       const price = parseFloat(item.selectedVariation?.price || item.product.price);
       return sum + price * item.quantity;
     }, 0);
-    const shippingCost = subtotal >= 200 ? 0 : 15;
+
+    // Apply discount if provided
+    const subtotalAfterDiscount = data.discountAmount
+      ? subtotal - data.discountAmount
+      : subtotal;
+
+    const shippingCost = subtotalAfterDiscount >= 200 ? 0 : 15;
 
     // Create line items for products
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = data.items.map((item) => {
@@ -55,6 +64,21 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
       };
     });
 
+    // Add discount as a negative line item if applicable
+    if (data.discountAmount && data.discountAmount > 0) {
+      line_items.push({
+        price_data: {
+          currency: 'pln',
+          product_data: {
+            name: data.couponCode ? `Rabat - ${data.couponCode}` : 'Rabat',
+            description: 'Kupon rabatowy',
+          },
+          unit_amount: -Math.round(data.discountAmount * 100), // Negative amount for discount
+        },
+        quantity: 1,
+      });
+    }
+
     // Add shipping as a line item if applicable
     if (shippingCost > 0) {
       line_items.push({
@@ -71,7 +95,7 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
     }
 
     // Prepare metadata for webhook (simplified cart data for WooCommerce order creation)
-    const orderMetadata = {
+    const orderMetadata: Record<string, string> = {
       billing_first_name: data.billingDetails.first_name,
       billing_last_name: data.billingDetails.last_name,
       billing_email: data.billingDetails.email,
@@ -101,9 +125,29 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
       ),
     };
 
+    // Add coupon code to metadata if provided
+    if (data.couponCode) {
+      orderMetadata.coupon_code = data.couponCode;
+    }
+
+    // Map payment method types
+    const getStripePaymentMethods = (methodType?: string): string[] => {
+      switch (methodType) {
+        case 'stripe_blik':
+          return ['blik'];
+        case 'stripe_p24':
+          return ['p24'];
+        case 'stripe_link':
+          return ['card', 'link']; // Link works with cards
+        case 'stripe':
+        default:
+          return ['card']; // Default to card payments
+      }
+    };
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'blik', 'p24'],
+      payment_method_types: getStripePaymentMethods(data.paymentMethodType),
       line_items,
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -113,7 +157,7 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
       locale: 'pl',
       billing_address_collection: 'auto',
       shipping_address_collection: {
-        allowed_countries: ['PL'],
+        allowed_countries: ['PL', 'US', 'GB', 'CA', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'SE', 'DK', 'FI', 'NO', 'IE', 'PT', 'CZ', 'GR', 'HU', 'RO'],
       },
       phone_number_collection: {
         enabled: true,

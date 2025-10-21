@@ -309,3 +309,112 @@ export const getPaymentGateways = async (): Promise<PaymentGateway[]> => {
     return [];
   }
 };
+
+// Coupons API
+export interface WooCommerceCoupon {
+  id: number;
+  code: string;
+  amount: string;
+  discount_type: 'percent' | 'fixed_cart' | 'fixed_product';
+  description: string;
+  date_expires: string | null;
+  usage_count: number;
+  individual_use: boolean;
+  product_ids: number[];
+  excluded_product_ids: number[];
+  usage_limit: number | null;
+  usage_limit_per_user: number | null;
+  limit_usage_to_x_items: number | null;
+  free_shipping: boolean;
+  product_categories: number[];
+  excluded_product_categories: number[];
+  exclude_sale_items: boolean;
+  minimum_amount: string;
+  maximum_amount: string;
+  email_restrictions: string[];
+  used_by: string[];
+}
+
+export const getCouponByCode = async (code: string): Promise<WooCommerceCoupon | null> => {
+  try {
+    const api = getApiClient();
+    const response = await api.get('coupons', {
+      code: code,
+      per_page: 1,
+    });
+    return response.data[0] || null;
+  } catch (error) {
+    console.error(`Error fetching coupon ${code}:`, error);
+    return null;
+  }
+};
+
+export interface ValidateCouponResult {
+  valid: boolean;
+  coupon?: WooCommerceCoupon;
+  error?: string;
+}
+
+export const validateCoupon = async (
+  code: string,
+  cartSubtotal: number,
+  productIds: number[]
+): Promise<ValidateCouponResult> => {
+  try {
+    const coupon = await getCouponByCode(code);
+
+    if (!coupon) {
+      return { valid: false, error: 'Kupon nie istnieje' };
+    }
+
+    // Check if expired
+    if (coupon.date_expires) {
+      const expiryDate = new Date(coupon.date_expires);
+      if (expiryDate < new Date()) {
+        return { valid: false, error: 'Kupon wygasł' };
+      }
+    }
+
+    // Check usage limit
+    if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
+      return { valid: false, error: 'Kupon osiągnął limit użyć' };
+    }
+
+    // Check minimum amount
+    if (coupon.minimum_amount && parseFloat(coupon.minimum_amount) > cartSubtotal) {
+      return {
+        valid: false,
+        error: `Minimalna wartość koszyka: $${coupon.minimum_amount}`
+      };
+    }
+
+    // Check maximum amount
+    if (coupon.maximum_amount && parseFloat(coupon.maximum_amount) < cartSubtotal) {
+      return {
+        valid: false,
+        error: `Maksymalna wartość koszyka: $${coupon.maximum_amount}`
+      };
+    }
+
+    // Check product restrictions
+    if (coupon.product_ids.length > 0) {
+      const hasValidProduct = productIds.some(id => coupon.product_ids.includes(id));
+      if (!hasValidProduct) {
+        return { valid: false, error: 'Kupon nie jest ważny dla produktów w koszyku' };
+      }
+    }
+
+    // Check excluded products
+    if (coupon.excluded_product_ids.length > 0) {
+      const hasExcludedProduct = productIds.some(id => coupon.excluded_product_ids.includes(id));
+      if (hasExcludedProduct) {
+        return { valid: false, error: 'Kupon nie może być użyty z wybranymi produktami' };
+      }
+    }
+
+    return { valid: true, coupon };
+  } catch (error) {
+    console.error(`Error validating coupon ${code}:`, error);
+    return { valid: false, error: 'Błąd weryfikacji kuponu' };
+  }
+};
