@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import type { WooCommerceProduct, WooCommerceVariation } from '@/types/woocommerce';
+import { getCdnUrl } from '@/lib/cdn';
 
 interface ProductDetailClientProps {
   product: WooCommerceProduct;
@@ -52,7 +53,7 @@ export function ProductDetailClient({ product, variations }: ProductDetailClient
         <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
           {product.images[selectedImage] ? (
             <Image
-              src={product.images[selectedImage].src}
+              src={getCdnUrl(product.images[selectedImage].src)}
               alt={product.images[selectedImage].alt || product.name}
               fill
               className="object-cover"
@@ -79,7 +80,7 @@ export function ProductDetailClient({ product, variations }: ProductDetailClient
                 }`}
               >
                 <Image
-                  src={image.src}
+                  src={getCdnUrl(image.src)}
                   alt={image.alt || product.name}
                   fill
                   className="object-cover"

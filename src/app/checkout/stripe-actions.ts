@@ -3,6 +3,7 @@
 import { getStripeClient } from '@/lib/stripe';
 import Stripe from 'stripe';
 import type { CartItem } from '@/store/cart-store';
+import { getCdnUrl } from '@/lib/cdn';
 
 interface BillingDetails {
   first_name: string;
@@ -48,6 +49,8 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
     // Create line items for products
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = data.items.map((item) => {
       const price = parseFloat(item.selectedVariation?.price || item.product.price);
+      const imageSrc = item.product.images?.[0]?.src ? getCdnUrl(item.product.images[0].src) : undefined;
+
       return {
         price_data: {
           currency: 'pln',
@@ -56,7 +59,7 @@ export async function createStripeCheckoutSession(data: CreateCheckoutSessionDat
             description: item.selectedVariation
               ? `Wariant: ${Object.values(item.selectedVariation.attributes || {}).join(', ')}`
               : undefined,
-            images: item.product.images?.[0]?.src ? [item.product.images[0].src] : [],
+            images: imageSrc ? [imageSrc] : [],
           },
           unit_amount: Math.round(price * 100), // Stripe expects amount in cents
         },

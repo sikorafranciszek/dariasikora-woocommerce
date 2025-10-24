@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Separator } from '@/components/ui/separator';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
+import { getCdnUrl } from '@/lib/cdn';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotal, getSubtotal } = useCartStore();
@@ -81,7 +82,7 @@ export default function CartPage() {
                     >
                       {image ? (
                         <Image
-                          src={image.src}
+                          src={getCdnUrl(image.src)}
                           alt={image.alt || item.product.name}
                           fill
                           className="object-cover"
