@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import type { WooCommerceProduct } from '@/types/woocommerce';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
+import { getCdnUrl } from '@/lib/cdn';
 
 interface ProductCardProps {
   product: WooCommerceProduct;
@@ -45,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="relative aspect-square overflow-hidden bg-muted/50">
             {mainImage ? (
               <Image
-                src={mainImage.src}
+                src={getCdnUrl(mainImage.src)}
                 alt={mainImage.alt || product.name}
                 fill
                 className="object-cover transition-all duration-300 group-hover:scale-110"
