@@ -4,10 +4,10 @@
  * @returns CDN URL or original URL if not a WordPress image
  */
 export function getCdnUrl(url: string | undefined | null): string {
-  if (!url) return '';
+  if (!url) return "";
 
-  const wpDomain = 'wp.dariasikora.com';
-  const cdnDomain = 'bunny-wp-pullzone-g5vrskbpzz.b-cdn.net';
+  const wpDomain = "wp.dariasikora.com";
+  const cdnDomain = "cdn.dariasikora.com";
 
   // Check if URL contains WordPress domain
   if (url.includes(wpDomain)) {
@@ -22,10 +22,12 @@ export function getCdnUrl(url: string | undefined | null): string {
  * @param images - Array of image objects with src property
  * @returns Array with CDN URLs
  */
-export function getCdnImages<T extends { src?: string }>(images: T[] | undefined): T[] {
+export function getCdnImages<T extends { src?: string }>(
+  images: T[] | undefined
+): T[] {
   if (!images) return [];
 
-  return images.map(image => ({
+  return images.map((image) => ({
     ...image,
     src: image.src ? getCdnUrl(image.src) : image.src,
   }));
